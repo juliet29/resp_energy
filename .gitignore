@@ -1,5 +1,6 @@
 # Custom
 static/_01_inputs/ResPlan.pkl
+static/_03_models/campaigns
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

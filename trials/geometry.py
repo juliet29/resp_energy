@@ -1,4 +1,8 @@
-from resp.eplus.interfaces import read_geoms_to_ezcase_rooms, test_layout_passes
+from resp.eplus.interfaces import (
+    get_layout_id,
+    read_geoms_to_ezcase_rooms,
+    test_layout_passes,
+)
 from resp.geom.interfaces import (
     create_layout_from_resplan,
     process_layout_and_write,
@@ -61,5 +65,5 @@ def test_get_excases():
 
 
 if __name__ == "__main__":
-    test_get_excases()
+    get_layout_id(show=True)
     # test_write_geom()
