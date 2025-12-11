@@ -1,6 +1,18 @@
 import networkx as nx
 import shapely as sp
 from pydantic import BaseModel, ConfigDict
+from typing import Literal, get_args
+
+
+RoomType = Literal[
+    "bedroom",
+    "kitchen",
+    "living",
+    "bathroom",
+    "veranda",
+    "balcony",
+    "stair",
+]
 
 
 class InputResplan(BaseModel):
@@ -31,3 +43,13 @@ class InputResplan(BaseModel):
     wall_depth: float
     storage: sp.MultiPolygon
     graph: nx.Graph
+
+    @property
+    def room_types(self):
+        return get_args(RoomType)
+
+    def get_rooms_of_type(self, room_type: RoomType):
+        return self.__getattribute__(room_type)
+
+    def get_rooms(self):
+        return {k: self.__getattribute__(k) for k in self.room_types}
