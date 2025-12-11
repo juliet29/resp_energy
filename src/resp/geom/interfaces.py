@@ -89,12 +89,13 @@ def create_layout_from_resplan(plan: InputResplan):
 
 
 def write_layout(layout: Layout, file_path: Path):
-    res = map(
-        lambda x: {
-            "name": x.name,
-            "coords": tuple_list_from_list_of_coords(x.normalized_coords),
+    res = starmap(
+        lambda ix, domain: {
+            "name": domain.name,
+            "id": ix,
+            "coords": tuple_list_from_list_of_coords(domain.normalized_coords),
         },
-        layout.domains,
+        enumerate(layout.domains),
     )
     write_json(list(res), file_path / Constants.processed_geom, OVERWRITE=True)
 

@@ -1,3 +1,4 @@
+from typing import Literal
 from utils4plans.paths import StaticPaths
 import pyprojroot
 
@@ -7,6 +8,9 @@ static_paths = StaticPaths("", BASE_PATH)
 
 
 # wonder if should separate file names..
+ResPlanIds = Literal["14877"]
+
+
 class Constants:
     processed_geom = "geom.json"
 
