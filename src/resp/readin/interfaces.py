@@ -45,6 +45,10 @@ class InputResplan(BaseModel):
     graph: nx.Graph
 
     @property
+    def string_id(self):
+        return str(self.id)
+
+    @property
     def room_types(self):
         return get_args(RoomType)
 

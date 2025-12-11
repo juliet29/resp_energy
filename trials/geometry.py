@@ -1,8 +1,11 @@
+import shapely as sp
+from shapely.plotting import plot_polygon
 from resp.geom.interfaces import (
     create_layout_from_resplan,
+    process_layout_and_write,
 )
 from resp.readin.access import get_plan_from_subset
-from polymap.visuals.visuals import plot_layout
+from polymap.visuals.visuals import plot_layout, plot_polygon
 from polymap.process.process import process_layout
 
 
@@ -17,8 +20,19 @@ def test_make_layout_from_resplan():
 
 
 def test_create_room_list(plot_first=False):
-    plan = get_plan_from_subset(ix=9)
+    plan = get_plan_from_subset(ix=2)
     layout = create_layout_from_resplan(plan)
+
+    test_union = False
+    if test_union:
+
+        kl = sp.union(
+            layout.get_domain("living_0").polygon,
+            layout.get_domain("kitchen_0").polygon,
+        )
+        plot_polygon(
+            kl, title="kl union", show=True
+        )  # pyright: ignore[reportArgumentType]
 
     if plot_first:
         plot_layout(layout, str(plan.id))
@@ -28,5 +42,10 @@ def test_create_room_list(plot_first=False):
     # )
 
 
+def test_write_geom():
+    plan = get_plan_from_subset(ix=2)
+    process_layout_and_write(plan)
+
+
 if __name__ == "__main__":
-    test_create_room_list(plot_first=True)
+    test_write_geom()
