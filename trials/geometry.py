@@ -1,8 +1,9 @@
-from resp.eplus.interfaces import read_geoms_to_ezcase_rooms
+from resp.eplus.interfaces import read_geoms_to_ezcase_rooms, test_layout_passes
 from resp.geom.interfaces import (
     create_layout_from_resplan,
     process_layout_and_write,
 )
+from resp.paths import ResPlanIds
 from resp.readin.access import get_plan_from_subset
 from polymap.visuals.visuals import plot_layout
 from polymap.process.process import process_layout
@@ -54,8 +55,9 @@ def test_write_geom():
 def test_get_excases():
     # id = get_layout_id()
     # print(id)
-    res = read_geoms_to_ezcase_rooms("14877")
-    print(res)
+    id: ResPlanIds = "14877"
+    res = read_geoms_to_ezcase_rooms(id)
+    test_layout_passes(id)
 
 
 if __name__ == "__main__":

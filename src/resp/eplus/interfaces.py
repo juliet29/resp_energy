@@ -8,6 +8,7 @@ from resp.constants import ROOM_HEIGHT
 from utils4plans.geom import CoordsType
 
 from resp.paths import Constants, DynamicPaths, ResPlanIds
+from replan2eplus.ezcase.ez import EZ
 
 
 class GeomRoom(BaseModel):
@@ -37,7 +38,6 @@ class GeomPlan(BaseModel):
 def read_geoms_to_ezcase_rooms(layout_id: ResPlanIds):
     file_name = DynamicPaths.processed_plan_geoms / layout_id / Constants.processed_geom
     data = read_json(file_name)
-    print(data)
     geom_plan = GeomPlan.model_validate({"rooms": data})
 
     return geom_plan.ezcase_rooms
@@ -52,3 +52,12 @@ def get_layout_id(ix: int = 0, show=False) -> ResPlanIds:
     new_id = ids[ix]
     assert new_id in get_args(ResPlanIds)
     return new_id  # pyright: ignore[reportReturnType]
+
+
+def test_layout_passes(layout_id: ResPlanIds):
+    rooms = read_geoms_to_ezcase_rooms(layout_id)
+    case = EZ()
+    case.add_zones(rooms)
+    case.idf.printidf()
+    # ideallly plot the empty case
+    return True
