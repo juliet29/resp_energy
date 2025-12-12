@@ -1,6 +1,5 @@
 from typing import NamedTuple
 from pathlib import Path
-from pandas import read_json
 from polymap.process.process import process_layout
 from utils4plans.geom import tuple_list_from_list_of_coords
 from utils4plans.io import write_json
@@ -10,13 +9,12 @@ from polymap.layout.interfaces import Layout
 from polymap.geometry.shapely_helpers import get_coords_from_shapely_polygon
 import shapely as sp
 
-from resp.paths import Constants, DynamicPaths, ResPlanIds
+from resp.paths import Constants, DynamicPaths
 from resp.readin.interfaces import InputResplan, RoomType
 from itertools import starmap
 
 
 class RoomData(NamedTuple):
-    # this was under one geom, one room regime, here have groups..
     room_type: RoomType
     ix: int
     poly: sp.Polygon
@@ -27,28 +25,15 @@ class RoomData(NamedTuple):
 
     @property
     def name(self):
-        return f"{self.room_type.lower()}_{self.ix}"  # TODO do the names have to be independent? -> maybe have also a type?
-
-    # @property
-    # def room(self):
-    #     return Room(self.id, self.name, self.domain, self.height)
+        return f"{self.room_type.lower()}_{self.ix}"
 
     @property
     def coords(self):
         return get_coords_from_shapely_polygon(self.poly)
 
-    # @property
-    # def tuple_coords(self):
-    #     return [Coord(*i).as_tuple for i in self.poly.exterior.normalize().coords]
-
     @property
     def ortho_domain(self):
         return FancyOrthoDomain(self.coords, self.name)
-
-    # @property
-    # def is_orthogonal(self):
-    #     return self.ortho_domain.is_orthogonal
-    #
 
 
 def create_room_data_from_room_type(room_type: RoomType, multipolygon: sp.MultiPolygon):
@@ -87,7 +72,7 @@ def create_layout_from_resplan(plan: InputResplan):
     room_data = create_room_data_for_resplan(plan)
     doms = map(lambda x: x.ortho_domain, room_data)
     l1 = Layout(list(doms))
-    return l1  # filter_domains(l1)
+    return l1
 
 
 def write_layout(layout: Layout, file_path: Path):
@@ -105,12 +90,8 @@ def write_layout(layout: Layout, file_path: Path):
 def process_layout_and_write(plan: InputResplan):
     layout = create_layout_from_resplan(plan)
     cleaned_layout = clean_up_layout(layout)
-    eplus_layout = process_layout(other_layout_id=plan.string_id, layout=cleaned_layout)
-    # get edhes here...?
-    write_layout(eplus_layout, DynamicPaths.processed_plan_geoms / plan.string_id)
-
-
-def read_layout(file_path: Path, resplan_id: ResPlanIds):
-    res = read_json(
-        DynamicPaths.processed_plan_geoms / resplan_id / Constants.processed_geom
+    processed_layout = process_layout(
+        other_layout_id=plan.string_id, layout=cleaned_layout
     )
+    write_layout(processed_layout, DynamicPaths.processed_plan_geoms / plan.string_id)
+    return cleaned_layout, processed_layout

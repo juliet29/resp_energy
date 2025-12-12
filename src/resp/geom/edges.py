@@ -6,7 +6,7 @@ from replan2eplus.ops.subsurfaces.interfaces import Edge
 from replan2eplus.ops.subsurfaces.user_interfaces import EdgeGroup
 from utils4plans.lists import chain_flatten
 
-from resp.paths import Constants, DynamicPaths, ResPlanIds
+from resp.paths import Constants, DynamicPaths
 from resp.readin.interfaces import AdjacencyType, InputResplan
 import shapely as sp
 from loguru import logger
@@ -72,8 +72,8 @@ def create_edge_group(
 
 
 def get_internal_edges(
-    processed_layout: Layout,
     original_layout: Layout,
+    processed_layout: Layout,
     adjacency_objects_holder: AdjacencyObjects,
     adjacency_type: AdjacencyType,  # maybe can do the whole adjacency object and just a string for the type
     buffer_size: float,
@@ -104,10 +104,6 @@ def get_internal_edges(
     return create_edge_group(edges, adjacency_type, "Zone_Zone")
 
 
-# NOTE: front door is special because only connects to living.. (https://github.com/m-agour/ResPlan/blob/main/resplan_utils.py#L247), not really ready to handle that in replan atm.., would just be used for orienting..
-#
-
-
 def get_external_edges(
     original_layout: Layout,
     adjacency_objects_holder: AdjacencyObjects,
@@ -135,7 +131,7 @@ def get_external_edges(
 
 
 def create_subsurface_inputs(
-    processed_layout: Layout, orignal_layout: Layout, plan: InputResplan
+    orignal_layout: Layout, processed_layout: Layout, plan: InputResplan
 ):
     adj_obj = get_adjacency_objects(plan)
     buf_size = calculate_buf_factor(wall_width=plan.wall_depth)
@@ -150,8 +146,15 @@ def create_subsurface_inputs(
 
 
 def write_subsurface_inputs(
-    internal: EdgeGroup, external: EdgeGroup, resplan_id: ResPlanIds
+    orignal_layout: Layout, processed_layout: Layout, plan: InputResplan
 ):
-    path = DynamicPaths.processed_plan_geoms / resplan_id
+    internal, external = create_subsurface_inputs(
+        orignal_layout, processed_layout, plan
+    )
+    path = DynamicPaths.processed_plan_geoms / plan.string_id
     internal.write(path / Constants.internal_edges)
     external.write(path / Constants.external_edges)
+
+
+# NOTE: front door is special because only connects to living.. (https://github.com/m-agour/ResPlan/blob/main/resplan_utils.py#L247), not really ready to handle that in replan atm.., would just be used for orienting..
+#
