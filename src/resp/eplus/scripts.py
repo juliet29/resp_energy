@@ -14,7 +14,7 @@ from resp.config import OUTPUT_CAMPAIGN_NAME, WEATHER_FILE, ANALYSIS_PERIOD
 def run_generate_experiments():
     print("Preparing to generate experimens. Campaign defn=")
     print(campaign_defn)
-    generate_experiments([], Path(""))
+    generate_experiments([], [], Path(""))
 
 
 def run_execute_experiments(campaign_name: OutputCampaignNames = OUTPUT_CAMPAIGN_NAME):
@@ -46,5 +46,5 @@ def run_execute_experiments(campaign_name: OutputCampaignNames = OUTPUT_CAMPAIGN
 
 
 if __name__ == "__main__":
-    # run_generate_experiments()
-    run_execute_experiments()
+    run_generate_experiments()
+    # run_execute_experiments()

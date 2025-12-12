@@ -9,8 +9,8 @@ static_paths = StaticPaths("", BASE_PATH)
 
 # wonder if should separate file names..
 ResPlanIds = Literal["16969", "14433", "14926", "3467", "14877", "17054"]
-InputCampaignNames = Literal["zones_only"]
-OutputCampaignNames = Literal["251211_zones_only"]
+InputCampaignNames = Literal["zones_only", "plus_subsurf"]
+OutputCampaignNames = Literal["251211_zones_only", "251211_plus_subsurf"]
 
 
 class Constants:
