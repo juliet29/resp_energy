@@ -1,11 +1,11 @@
 from typing import Literal, NamedTuple, Sequence
 from itertools import combinations
 from polymap.geometry.ortho import FancyOrthoDomain
-from polymap.layout.interfaces import Layout
 from replan2eplus.ops.subsurfaces.interfaces import Edge
 from replan2eplus.ops.subsurfaces.user_interfaces import EdgeGroup
 from utils4plans.lists import chain_flatten
 
+from resp.geom.interfaces import LayoutResults
 from resp.paths import Constants, DynamicPaths
 from resp.readin.interfaces import AdjacencyType, InputResplan
 import shapely as sp
@@ -72,14 +72,13 @@ def create_edge_group(
 
 
 def get_internal_edges(
-    original_layout: Layout,
-    processed_layout: Layout,
+    lr: LayoutResults,
     adjacency_objects_holder: AdjacencyObjects,
     adjacency_type: AdjacencyType,  # maybe can do the whole adjacency object and just a string for the type
     buffer_size: float,
 ):
     def find_adjacent_domains():
-        combos = combinations(processed_layout.domains, 2)
+        combos = combinations(lr.processed.domains, 2)
         adjacent_domain_pairs: list[tuple[FancyOrthoDomain, FancyOrthoDomain]] = []
         for i, j in combos:
             if i.polygon.touches(j.polygon):
@@ -93,8 +92,14 @@ def get_internal_edges(
 
     edges = []
     for i, j in adjacent_domains:
-        i_original = original_layout.get_domain(i.name)
-        j_original = original_layout.get_domain(j.name)
+        try:
+            i_original = lr.original.get_domain(i.name)
+            j_original = lr.original.get_domain(j.name)
+        except AssertionError as e:
+            logger.warning(
+                f"Couldn't find domain for {i.name} or {j.name} in {[i.name for i in lr.original.domains]}: {e}"
+            )
+            continue
         for buf_obj in adjacency_objects:
             if buf_obj.intersects(i_original.polygon) and buf_obj.intersects(
                 j_original.polygon
@@ -105,7 +110,7 @@ def get_internal_edges(
 
 
 def get_external_edges(
-    original_layout: Layout,
+    lr: LayoutResults,
     adjacency_objects_holder: AdjacencyObjects,
     adjacency_type: AdjacencyType,
     buffer_size: float,
@@ -124,33 +129,25 @@ def get_external_edges(
     buf_objs = adjacency_objects_holder.get_buffered_objects(
         adjacency_type, buffer_size
     )
-    all_edges = map(lambda x: study_domain(x), original_layout.domains)
+    all_edges = map(lambda x: study_domain(x), lr.original.domains)
     res = chain_flatten(list(all_edges))
 
     return create_edge_group(res, adjacency_type, "Zone_Direction")
 
 
-def create_subsurface_inputs(
-    orignal_layout: Layout, processed_layout: Layout, plan: InputResplan
-):
+def create_subsurface_inputs(lr: LayoutResults, plan: InputResplan):
     adj_obj = get_adjacency_objects(plan)
-    buf_size = calculate_buf_factor(wall_width=plan.wall_depth)
-    logger.debug(f"wall depth = {plan.wall_depth}")
+    buf_size = calculate_buf_factor()
+    # logger.debug(f"wall depth = {plan.wall_depth}")
 
-    internal_edges = get_internal_edges(
-        processed_layout, orignal_layout, adj_obj, "door", buf_size
-    )
-    external_edges = get_external_edges(orignal_layout, adj_obj, "window", buf_size)
+    internal_edges = get_internal_edges(lr, adj_obj, "door", buf_size)
+    external_edges = get_external_edges(lr, adj_obj, "window", buf_size)
 
     return internal_edges, external_edges
 
 
-def write_subsurface_inputs(
-    orignal_layout: Layout, processed_layout: Layout, plan: InputResplan
-):
-    internal, external = create_subsurface_inputs(
-        orignal_layout, processed_layout, plan
-    )
+def write_subsurface_inputs(lr: LayoutResults, plan: InputResplan):
+    internal, external = create_subsurface_inputs(lr, plan)
     path = DynamicPaths.processed_plan_geoms / plan.string_id
     internal.write(path / Constants.internal_edges)
     external.write(path / Constants.external_edges)

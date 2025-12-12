@@ -14,6 +14,11 @@ from resp.readin.interfaces import InputResplan, RoomType
 from itertools import starmap
 
 
+class LayoutResults(NamedTuple):
+    original: Layout
+    processed: Layout
+
+
 class RoomData(NamedTuple):
     room_type: RoomType
     ix: int
@@ -94,4 +99,4 @@ def process_layout_and_write(plan: InputResplan):
         other_layout_id=plan.string_id, layout=cleaned_layout
     )
     write_layout(processed_layout, DynamicPaths.processed_plan_geoms / plan.string_id)
-    return cleaned_layout, processed_layout
+    return LayoutResults(original=cleaned_layout, processed=processed_layout)
