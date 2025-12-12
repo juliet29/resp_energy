@@ -1,0 +1,1 @@
+{"edges": [["bedroom_0", "NORTH"], ["NORTH", "bathroom_1"], ["bedroom_1", "WEST"], ["WEST", "living_0"]], "detail": "window", "type_": "Zone_Direction"}

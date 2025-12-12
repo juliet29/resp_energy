@@ -1,7 +1,8 @@
+from loguru import logger
 from resp.eplus.interfaces import (
-    get_layout_id,
+    make_details,
+    read_edges,
     read_geoms_to_ezcase_rooms,
-    test_layout_passes,
 )
 from resp.geom.interfaces import (
     create_layout_from_resplan,
@@ -61,9 +62,13 @@ def test_get_excases():
     # print(id)
     id: ResPlanIds = "14877"
     res = read_geoms_to_ezcase_rooms(id)
-    test_layout_passes(id)
+    edges = read_edges(id)
+    details = make_details()
+    logger.debug(edges)
+    logger.debug(details)
 
 
 if __name__ == "__main__":
-    get_layout_id(show=True)
+    # get_layout_id(show=True)
+    test_get_excases()
     # test_write_geom()

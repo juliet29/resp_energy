@@ -9,12 +9,12 @@ def write_resplans_from_subset():
     for i in range(10):
         plan = get_plan_from_subset(DynamicPaths.rp10, i)
         try:
-            cleaned_layout, process_layout = process_layout_and_write(plan)
+            layout_result = process_layout_and_write(plan)
         except Exception as e:
             print(f"Failure for ix={i}, plan={plan.string_id}: {e}")
             continue
 
-        write_subsurface_inputs(cleaned_layout, process_layout, plan)
+        write_subsurface_inputs(layout_result, plan)
 
 
 if __name__ == "__main__":
