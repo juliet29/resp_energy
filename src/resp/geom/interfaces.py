@@ -68,7 +68,8 @@ def create_room_data_for_resplan(plan: InputResplan):
 
 def clean_up_layout(layout: Layout):
     res = filter(
-        lambda x: x.name not in ["bathroom_0", "balcony_0", "living_0", "kitchen_0"],
+        lambda x: x.name
+        not in ["bathroom_0", "balcony_0", "living_0", "kitchen_0", "living_1"],
         layout.domains,
     )
     kl = sp.union(

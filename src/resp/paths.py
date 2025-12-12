@@ -18,6 +18,9 @@ class Constants:
     idf_name = "out.idf"  # TODO: get from ep_paths.. same with sql..
     metadata = "metadata.toml"
     definition = "defn.toml"
+    internal_edges = "in_edges.json"
+    external_edges = "ext_edges.json"
+    details = "details.json"
 
 
 class DynamicPaths:
