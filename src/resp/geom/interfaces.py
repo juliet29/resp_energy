@@ -1,5 +1,6 @@
 from typing import NamedTuple
 from pathlib import Path
+from pandas import read_json
 from polymap.process.process import process_layout
 from utils4plans.geom import tuple_list_from_list_of_coords
 from utils4plans.io import write_json
@@ -9,7 +10,7 @@ from polymap.layout.interfaces import Layout
 from polymap.geometry.shapely_helpers import get_coords_from_shapely_polygon
 import shapely as sp
 
-from resp.paths import Constants, DynamicPaths
+from resp.paths import Constants, DynamicPaths, ResPlanIds
 from resp.readin.interfaces import InputResplan, RoomType
 from itertools import starmap
 
@@ -104,4 +105,11 @@ def process_layout_and_write(plan: InputResplan):
     layout = create_layout_from_resplan(plan)
     cleaned_layout = clean_up_layout(layout)
     eplus_layout = process_layout(other_layout_id=plan.string_id, layout=cleaned_layout)
+    # get edhes here...?
     write_layout(eplus_layout, DynamicPaths.processed_plan_geoms / plan.string_id)
+
+
+def read_layout(file_path: Path, resplan_id: ResPlanIds):
+    res = read_json(
+        DynamicPaths.processed_plan_geoms / resplan_id / Constants.processed_geom
+    )

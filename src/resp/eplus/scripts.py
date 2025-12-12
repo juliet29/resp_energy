@@ -46,4 +46,5 @@ def run_execute_experiments(campaign_name: OutputCampaignNames = OUTPUT_CAMPAIGN
 
 
 if __name__ == "__main__":
-    run_generate_experiments()
+    # run_generate_experiments()
+    run_execute_experiments()

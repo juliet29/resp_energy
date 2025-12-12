@@ -9,10 +9,12 @@ RoomType = Literal[
     "kitchen",
     "living",
     "bathroom",
+    "storage",
     "veranda",
     "balcony",
     "stair",
 ]
+AdjacencyType = Literal["door", "window", "front_door"]
 
 
 class InputResplan(BaseModel):
@@ -49,11 +51,18 @@ class InputResplan(BaseModel):
         return str(self.id)
 
     @property
+    def adjacency_types(self):
+        return get_args(AdjacencyType)
+
+    @property
     def room_types(self):
         return get_args(RoomType)
 
     def get_rooms_of_type(self, room_type: RoomType):
         return self.__getattribute__(room_type)
 
-    def get_rooms(self):
-        return {k: self.__getattribute__(k) for k in self.room_types}
+    def get_adjacencies_of_type(self, adjacancy_type: AdjacencyType):
+        return self.__getattribute__(adjacancy_type)
+
+    # def get_rooms(self):
+    #     return {k: self.__getattribute__(k) for k in self.room_types}
